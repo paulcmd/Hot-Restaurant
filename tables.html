@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+​
+<head>
+    <meta charset="UTF-8">
+    <title>Tables Page</title>
+    ​
+    <!-- Latest compiled and minified CSS & JS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    ​
+</head>
+​
+<body>
+​
+<div class="container">
+    ​
+    <div class="jumbotron">
+        <h1 class="text-center"><span class="fa fa-fire"></span> Hot Restaurant</h1>
+        <hr>
+        <h2 class="text-center">Current Reservations and Waiting List</h2>
+        <br>
+        ​
+        <div class="text-center">
+            <a href="/reserve">
+                <button class="btn btn-lg btn-danger"><span class="fa fa-credit-card"></span> Make
+                    Reservation
+                </button>
+            </a>
+            <a href="/">
+                <button class="btn btn-lg btn-default"><span class="fa fa-home"></span></button>
+            </a>
+        </div>
+    </div>
+</div>
+​
+<div class="container">
+    <div class="card" id="reservations">
+
+        <div class="card-header">
+            <h2>Tables</h2>
+        </div>
+        <br>
+        <div class="card-header">
+            <h3>Current Reservations</h3>
+        </div>
+    </div>
+    <div class="card" id="waitlist">
+        <div class="card-header">
+            <h3>Wait List</h3>
+        </div>
+    </div>
+</div>
+
+<footer class="footer mt-4">
+
+    <div class="container">
+        <p>
+            <a href="#" id="clear">Clear Tables</a>
+        </p>
+    </div>
+</footer>
+</body>
+
+<script type="text/javascript">
+
+    function reservationsQuery() {
+
+        $.get("/api/reservations", function (reservations) {
+
+            console.log(reservations);
+
+            if (reservations) {
+                var table = 1;
+                for (var i = 0; i < reservations.length; i++) {
+                    var div = $("<div>");
+                    div.addClass("card-body");
+                    var title = $("<h4>");
+                    title.addClass("card-title");
+                    title.text("Table Number : " + table);
+                    var id = $("<h5>");
+                    id.text("ID: " + reservations[i].uniqueId);
+                    var name = $("<h5>");
+                    name.text("Name: " + reservations[i].name);
+                    var phone = $("<h5>");
+                    phone.text("Phone Number: " + reservations[i].phoneNumber);
+                    var email = $("<h5>");
+                    email.text("Email: " + reservations[i].email);
+
+                    table++;
+
+                    $(div).append(title, id, name, phone, email);
+                    $("#reservations").append(div);
+                }
+
+            }
+
+        })
+    }
+
+
+    function waitLIstQuery() {
+        $.get("/api/waitlist", function (waitList) {
+
+            console.log(waitList);
+
+            if (waitList) {
+                for (var i = 0; i < waitList.length; i++) {
+                    var div = $("<div>");
+                    div.addClass("card-body");
+                    var id = $("<h5>");
+                    id.text("ID: " + waitList[i].uniqueId);
+                    var name = $("<h5>");
+                    name.text("Name: " + waitList[i].name);
+                    var phone = $("<h5>");
+                    phone.text("Phone Number: " + waitList[i].phoneNumber);
+                    var email = $("<h5>");
+                    email.text("Email: " + waitList[i].email);
+
+                    $(div).append(id, name, phone, email);
+                    $("#waitlist").append(div);
+                }
+
+            }
+
+        })
+    }
+
+    function clearContents() {
+        alert("Clearing...");
+
+        $.ajax({url: "/api/clear", method: "POST"}).then(function () {
+            $("#waitlist").empty();
+            $("#reservations").empty();
+
+        });
+    }
+    $("#clear").on("click", clearContents);
+
+    reservationsQuery();
+    waitLIstQuery();
+</script>
+
+</html>
